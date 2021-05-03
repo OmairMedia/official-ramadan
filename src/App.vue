@@ -1,30 +1,21 @@
-<template>
-  <div id="nav">
-    <router-link to="/">Home</router-link> |
-    <router-link to="/about">About</router-link>
+<template class="flex flex-col">
+  <nav-bar />
+  <div class="min-h-screen">
+    <router-view />
   </div>
-  <router-view/>
+  <footer-element />
 </template>
 
-<style>
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-}
+<script>
+  import navBar from "./components/_navbar";
+  import footerElement from "./components/_footer";
 
-#nav {
-  padding: 30px;
-}
+  export default {
+    components: {
+      navBar,
+      footerElement,
+    },
+  };
+</script>
 
-#nav a {
-  font-weight: bold;
-  color: #2c3e50;
-}
-
-#nav a.router-link-exact-active {
-  color: #42b983;
-}
-</style>
+<style></style>
