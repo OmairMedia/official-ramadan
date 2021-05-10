@@ -1,4 +1,8 @@
 <template>
+  <!-- Countdown Banner Starts Here -->
+  <countdown />
+  <!-- Countdown Banner Ends Here -->
+
   <!-- Showcase Section Starts Here -->
   <section class="showcase flex justify-end items-center">
     <div class="text  max-w-md p-4 mr-20">
@@ -326,10 +330,13 @@
 </template>
 
 <script>
-  // @ is an alias to /src
+  import countdown from "../components/countdown";
 
   export default {
     name: "Home",
+    components: {
+      countdown,
+    },
   };
 </script>
 
