@@ -12,6 +12,20 @@
           <div class="flex items-center justify-center" v-if="status == 'sehr'">
             <p class="text-4xl font-bold text-white">Till Sehr</p>
           </div>
+          <div
+            class="flex flex-col items-center justify-center p-3 rounded-lg bg-indigo-700"
+          >
+            <div
+              class="py-2 px-4 rounded-lg bg-indigo-800 flex items-center justify-center"
+            >
+              <p class="font-bold text-xl text-white">Sehr</p>
+            </div>
+            <p class="text-center font-medium text-white truncate">
+              <span class="text-2xl font-bold tracking-wide">
+                {{ getRamadanToday.sehr ? getRamadanToday.sehr : "00:00:00" }}
+              </span>
+            </p>
+          </div>
           <div class="flex flex-col items-center justify-center">
             <div
               class="py-2 px-4 rounded-lg bg-indigo-800 flex items-center justify-center"
@@ -271,6 +285,7 @@
     },
     methods: {
       calculateCountDown() {
+        // let stat = this.status;
         let today = moment().format("DD-MM-YYYY");
 
         let filtered = this.calender.filter((x) => x.date == today);
@@ -279,72 +294,148 @@
           let now = filtered[0];
           let iftartime = now.iftar;
           let sehrtime = now.sehr;
-          console.log(sehrtime);
 
-          let result = calculatefunction(sehrtime);
+          let getDifference = checkIftarOrSehr(sehrtime);
 
-          function calculatefunction(time) {
-            if (time) {
-              let splittime = time.split(":");
-              let splittime2 = splittime[1].split(" ");
-              if (splittime && splittime2) {
-                let hours = splittime[0];
-                let minutes = splittime2[0];
-
-                let dummy = new Date().toString();
-
-                let splitstring = dummy.split(" ");
-
-                let HourInNumber = Number(hours);
-
-                splitstring[4] = `${HourInNumber}:${minutes}:00`;
-                let joinedstring = splitstring.join(" ");
-
-                let finaltime = new Date(joinedstring).getTime();
-
-                let nowtime = new Date().getTime();
-
-                // object.Differential
-                const diff = Math.floor(finaltime - nowtime);
-
-                // if no difference
-                if (diff == 0) {
-                }
-
-                // Calculation the difference of both times
-                // Formulas
-                const calculatesecond = 1000;
-                const calculateminute = calculatesecond * 60;
-                const calculatehour = calculateminute * 60;
-                const calculateday = calculatehour * 24;
-
-                // Calculations Logic
-                const textday = Math.floor(diff / calculateday);
-                const texthour = Math.floor(
-                  (diff % calculateday) / calculatehour
-                );
-                const textminutes = Math.floor(
-                  (diff % calculatehour) / calculateminute
-                );
-                const textseconds = Math.floor(
-                  (diff % calculateminute) / calculatesecond
-                );
-
-                let totaltime = {
-                  days: Math.abs(textday),
-                  hours: Math.abs(texthour),
-                  minutes: Math.abs(textminutes),
-                  seconds: Math.abs(textseconds),
-                };
-
-                return totaltime;
-              }
+          if (getDifference) {
+            let makeArray = getDifference.toString().split("");
+            if (makeArray[0] == "-") {
+              this.status = "sehr";
+              // Sehri Calculations
+              let sehriDifference = checkIftarOrSehr(sehrtime);
+              let resultForSehri = calculateFromDifference(sehriDifference);
+              this.timeForCountDown = resultForSehri;
+            } else {
+              this.status = "iftar";
+              // Iftar Calculations
+              let iftarDifference = checkIftarOrSehr(iftartime);
+              let resultForIftar = calculateFromDifference(iftarDifference);
+              this.timeForCountDown = resultForIftar;
             }
           }
 
+          // Sehri Timings Calculations
+          let result = calculateFromDifference(getDifference);
           this.timeForCountDown = result;
-          console.log(result);
-          return result;
+
+          function checkIftarOrSehr(time) {
+            let sehrsplittime = time.split(":");
+            let sehrsplittime2 = sehrsplittime[1].split(" ");
+
+            // Calculation
+            let sehrhours = sehrsplittime[0];
+            let sehrminutes = sehrsplittime2[0];
+
+            let dummy = new Date().toString();
+
+            let splitstring = dummy.split(" ");
+
+            let HourInNumber = Number(sehrhours);
+
+            splitstring[4] = `${HourInNumber}:${sehrminutes}:00`;
+            let joinedstring = splitstring.join(" ");
+
+            let finaltime = new Date(joinedstring).getTime();
+
+            let nowtime = new Date().getTime();
+
+            // object.Differential
+            const diff = Math.floor(finaltime - nowtime);
+
+            return diff;
+          }
+
+          function calculateFromDifference(diff) {
+            // Formulas
+            const calculatesecond = 1000;
+            const calculateminute = calculatesecond * 60;
+            const calculatehour = calculateminute * 60;
+            const calculateday = calculatehour * 24;
+
+            // Calculations Logic
+            const textday = Math.floor(diff / calculateday);
+            const texthour = Math.floor((diff % calculateday) / calculatehour);
+            const textminutes = Math.floor(
+              (diff % calculatehour) / calculateminute
+            );
+            const textseconds = Math.floor(
+              (diff % calculateminute) / calculatesecond
+            );
+
+            let totaltime = {
+              days: Math.abs(textday),
+              hours: Math.abs(texthour),
+              minutes: Math.abs(textminutes),
+              seconds: Math.abs(textseconds),
+            };
+
+            return totaltime;
+          }
+
+          console.log(this.timeForCountDown);
+
+          // let result = calculatefunction(sehrtime);
+
+          // function calculatefunction(time) {
+          //   if (time) {
+          //     let splittime = time.split(":");
+          //     let splittime2 = splittime[1].split(" ");
+          //     if (splittime && splittime2) {
+          //       let hours = splittime[0];
+          //       let minutes = splittime2[0];
+
+          //       let dummy = new Date().toString();
+
+          //       let splitstring = dummy.split(" ");
+
+          //       let HourInNumber = Number(hours) + 12;
+
+          //       splitstring[4] = `${HourInNumber}:${minutes}:00`;
+
+          //       let joinedstring = splitstring.join(" ");
+
+          //       let finaltime = new Date(joinedstring).getTime();
+
+          //       let nowtime = new Date().getTime();
+
+          //       // object.Differential
+          //       const diff = Math.floor(finaltime - nowtime);
+
+          //       // Calculation the difference of both times
+
+          //       // Formulas
+          //       const calculatesecond = 1000;
+          //       const calculateminute = calculatesecond * 60;
+          //       const calculatehour = calculateminute * 60;
+          //       const calculateday = calculatehour * 24;
+
+          //       // Calculations Logic
+          //       const textday = Math.floor(diff / calculateday);
+          //       const texthour = Math.floor(
+          //         (diff % calculateday) / calculatehour
+          //       );
+          //       const textminutes = Math.floor(
+          //         (diff % calculatehour) / calculateminute
+          //       );
+          //       const textseconds = Math.floor(
+          //         (diff % calculateminute) / calculatesecond
+          //       );
+
+          //       let totaltime = {
+          //         days: Math.abs(textday),
+          //         hours: Math.abs(texthour),
+          //         minutes: Math.abs(textminutes),
+          //         seconds: Math.abs(textseconds),
+          //       };
+
+          //       return totaltime;
+          //     }
+          //   }
+          // }
+
+          // this.timeForCountDown = result;
+          // console.log(result);
+          // return result;
         }
       },
     },
